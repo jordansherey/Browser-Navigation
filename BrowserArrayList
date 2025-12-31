@@ -1,0 +1,140 @@
+public class BrowserArrayList<T> implements Iterable<T> {
+
+    // arr for storage, first and last for circular arr and size
+    private T[] arr;
+    private int first;
+    private int last;
+    private int size;
+
+    // constructor
+    public BrowserArrayList(int capacityInitial) {
+        first = 0;
+        last = 0;
+        size = 0;
+        arr = (T[]) new Object[capacityInitial];
+    }
+
+    // default constructor
+    public BrowserArrayList() {
+        this(10);
+    }
+
+    public int size() {
+        return size;
+    }
+
+    public boolean isEmpty() {
+        if (size == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public int capacity() {
+        return arr.length;
+    }
+
+    // for enqueue
+    public void addLast(T val) {
+        if (size == arr.length) {
+            resize(arr.length * 2);
+        }
+        arr[last] = val;
+        last = (last + 1) % arr.length;
+        size++;
+    }
+
+    public T removeFirst() {
+        if (isEmpty()) {
+            throw new java.util.NoSuchElementException();
+        }
+        T val = arr[first];
+        arr[first] = null;
+        first = (first + 1) % arr.length;
+        size--;
+        return val;
+    }
+
+    public T getFirst() {
+        if (isEmpty()) {
+            throw new java.util.NoSuchElementException();
+        }
+        return arr[first];
+    }
+
+    public T getLast() {
+        if (isEmpty()) {
+            throw new java.util.NoSuchElementException();
+        }
+        return arr[(last - 1 + arr.length) % arr.length];
+    }
+
+    public void clear() {
+        size = 0;
+        first = 0;
+        last = 0;
+    }
+
+    private void resize(int capacity) {
+        T[] resizedArr = (T[]) new Object[capacity];
+        for(int i = 0; i <size; i++) {
+            resizedArr[i] = arr[(first + i) % arr.length];
+        }
+        arr = resizedArr;
+        first = 0;
+        last = size;
+    }
+
+    private class BALIterator implements java.util.Iterator<T> {
+        private int count = 0;
+        private int current = first;
+
+        public boolean hasNext() {
+            if (count < size) {
+                return true;
+            }
+            return false;
+        }
+
+        public T next() {
+            if(!hasNext()) {
+                throw new java.util.NoSuchElementException();
+            }
+            T val = arr[current];
+            current = (current + 1) % arr.length;
+            count++;
+            return val;
+        }
+    }
+
+    public java.util.Iterator<T> iterator() {
+        return new BALIterator();
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

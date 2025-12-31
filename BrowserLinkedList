@@ -1,0 +1,178 @@
+
+public class BrowserLinkedList<T> implements Iterable<T> {
+
+    private int bllSize;
+    private int modificationCount = 0;
+    private Node head;
+    private Node tail;
+
+    public BrowserLinkedList() {
+        head = new Node(null, null, null);
+        tail = new Node(null, head, null);
+        head.next = tail;
+        bllSize = 0;
+    }
+
+    // nested node class
+    public class Node {
+        // data in nodes
+        public T val;
+        public Node prev;
+        public Node next;
+
+        // constructor for each node
+        public Node(T val, Node p, Node n){
+            this.val = val;
+            prev = p;
+            next = n;
+        }
+    }
+
+    private class BllIterator implements java.util.Iterator<T> {
+        private Node current = head.next;
+        private int expectedModificationCount = modificationCount;
+        private boolean RemoveAllowed = false;
+
+        public boolean hasNext() {
+            return current != tail;
+        }
+
+        public T next() {
+            if(modificationCount != expectedModificationCount){
+                throw new java.util.ConcurrentModificationException();
+            }
+            if(!hasNext()){
+                throw new java.util.NoSuchElementException();
+            }
+            T nextItem = current.val;
+            current = current.next;
+            RemoveAllowed = true;
+            return nextItem;
+        }
+
+        public void remove() {
+            if(modificationCount != expectedModificationCount){
+                throw new java.util.ConcurrentModificationException();
+            }
+            if(!RemoveAllowed){
+                throw new IllegalStateException();
+            }
+            BrowserLinkedList.this.remove(current.prev);
+            expectedModificationCount++;
+            RemoveAllowed = false;
+        }
+    }
+
+    private void remove(Node n) {
+        if(n == head || n == tail){
+            throw new java.util.NoSuchElementException();
+        }
+        n.prev.next = n.next;
+        n.next.prev = n.prev;
+
+        bllSize--;
+        modificationCount++;
+    }
+
+    public void addFirst(T val) {
+        Node newNode = new Node(val, head, head.next);
+        head.next.prev = newNode;
+        head.next = newNode;
+        bllSize++;
+        modificationCount++;
+    }
+
+    public Node getFirstNode() {
+        if (isEmpty()) return null;
+        return head.next;
+    }
+
+    public void addLast(T val) {
+        Node newNode = new Node(val, tail.prev, tail);
+        tail.prev.next = newNode;
+        tail.prev = newNode;
+        bllSize++;
+        modificationCount++;
+    }
+    public T removeFirst() {
+        if(isEmpty()) {
+            throw new java.util.NoSuchElementException();
+        }
+            T val = head.next.val;
+            remove(head.next);
+            return val;
+        }
+
+        public T removeLast() {
+        if(isEmpty()) {
+            throw new java.util.NoSuchElementException();
+        }
+            T val = tail.prev.val;
+            remove(tail.prev);
+            return val;
+        }
+
+        public T getFirst() {
+        if(isEmpty()) {
+            throw new java.util.NoSuchElementException();
+        }
+            return head.next.val;
+        }
+
+        public T getLast() {
+        if(isEmpty()) {
+            throw new java.util.NoSuchElementException();
+        }
+        return tail.prev.val;
+        }
+
+        public boolean isEmpty() {
+        if(bllSize == 0) {
+            return true;
+        }
+        return false;
+        }
+
+        public java.util.Iterator<T> iterator() {
+        return new BllIterator();
+        }
+
+        public int size() {
+        return bllSize;
+        }
+
+        public void clear() {
+        head.next = tail;
+        tail.prev = head;
+        bllSize = 0;
+        modificationCount++;
+        }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
